@@ -77,7 +77,7 @@ def login():  # view functions/endpoint
 @bp.route("/logout")
 def logout():
     session.clear()
-    redirect(url_for("index"))
+    return redirect(url_for("index"))
 
 
 # Runs the function before the view functions
