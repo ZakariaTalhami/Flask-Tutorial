@@ -32,7 +32,14 @@ def create_app(test_config=None):
 
     # Register blue prints
     from . import auth
+    from . import blog
     app.register_blueprint(auth.bp)
+    app.register_blueprint(blog.bp)
+
+    # adds a URL rule, mapping "index" to "/"
+    # so url_for("blog.index") and url_for("index")
+    # both will point to "/"
+    app.add_url_rule("/", endpoint="index")
 
     return app
 
