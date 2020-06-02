@@ -5,6 +5,11 @@ import functools
 
 bp = Blueprint("auth", __name__ , url_prefix="/auth")
 
+# Response Messages
+USERNAME_REQUIRED = 'Username is required'
+PASSWORD_REQUIRED = 'Password is required'
+USER_EXISTS = '{username} already exists'
+INVALID_CREDENTIALS = 'Incorrect login Credentials.'
 
 # calls to route "/auth/register" will call the register function
 @bp.route("/register", methods=("GET", "POST"))
@@ -21,13 +26,13 @@ def register():  # view functions/endpoint
 
         # validate the form
         if not username:
-            error = "Username is required"
+            error = USERNAME_REQUIRED
         elif not password:
-            error = 'Password is required'
+            error = PASSWORD_REQUIRED
         elif db.execute(
             'SELECT id FROM user where username = ?', (username, )
         ).fetchone() is not None:
-            error = f"{username} already exists"
+            error = USER_EXISTS.format(username=username)
 
         if not error:
             db.execute(
@@ -58,7 +63,7 @@ def login():  # view functions/endpoint
         ).fetchone()
 
         if user is None or not check_password_hash(user["password"], password):
-            error = "Incorrect login Credentials."
+            error = INVALID_CREDENTIALS
 
         if error is None:
             # sessions is a dict that store data across requests.
@@ -84,7 +89,6 @@ def logout():
 @bp.before_app_request
 def load_logged_in_user():
     user_id = session.get("user_id")
-
     if not user_id:
         g.user = None
     else:

@@ -37,7 +37,6 @@ def runner(app):
     return app.test_cli_runner()
 
 
-
 class AuthActions:
     def __init__(self, client):
         self._client = client
@@ -49,4 +48,9 @@ class AuthActions:
         )
 
     def logout(self):
-        return self._clinet('/auth/logout')
+        return self._client.get('/auth/logout')
+
+
+@pytest.fixture
+def auth(client):
+    return AuthActions(client)
