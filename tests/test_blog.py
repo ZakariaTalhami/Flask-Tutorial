@@ -3,8 +3,13 @@ from flaskr.db import get_db
 import flaskr.blog as BLOG
 
 
-def test_index(client, auth):
-    response = client.get('/')
+@pytest.mark.parametrize(
+    'path',
+    '/1'
+    '/'
+)
+def test_index_viewer(client, auth, path):
+    response = client.get(path)
     assert response.status_code == 200
     assert b'Log In' in response.data
 

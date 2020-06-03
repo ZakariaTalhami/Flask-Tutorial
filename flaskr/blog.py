@@ -7,6 +7,7 @@ bp = Blueprint("blog", __name__)
 TITLE_REQUIRED = "Title is required."
 BODY_REQUIRED = "Body is required."
 
+
 @bp.route("/")
 def index():
     db = get_db()
@@ -16,6 +17,12 @@ def index():
         ' ORDER BY created DESC'
     ).fetchall()
     return render_template('blog/index.html', posts=posts)
+
+
+@bp.route('/<int:post_id>')
+def viewer(post_id):
+    post = get_post(post_id, check_author=False)
+    return render_template('blog/viewer.html', post=post)
 
 
 @bp.route("/create", methods=("POST", "GET"))
@@ -89,7 +96,7 @@ def delete(post_id):
     return redirect(url_for('index'))
 
 
-def get_post(post_id , check_author=True):
+def get_post(post_id, check_author=True):
     post = get_db().execute(
         'SELECT p.id, title, body, created, author_id, username'
         ' FROM post p join user u ON p.author_id = u.id'
