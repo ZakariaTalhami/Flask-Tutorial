@@ -4,6 +4,8 @@ from .auth import login_required
 
 bp = Blueprint("blog", __name__)
 
+TITLE_REQUIRED = "Title is required."
+BODY_REQUIRED = "Body is required."
 
 @bp.route("/")
 def index():
@@ -25,9 +27,9 @@ def create():
         error = None
 
         if not title:
-            error = "Title is required."
+            error = TITLE_REQUIRED
         elif not body:
-            error = "Body is required."
+            error = BODY_REQUIRED
 
         if error is None:
             db = get_db()
@@ -48,15 +50,17 @@ def create():
 @bp.route('/<int:post_id>/update', methods=("POST", "GET"))
 @login_required
 def update(post_id):
+    post = get_post(post_id)
+
     if request.method == "POST":
         title = request.form['title']
         body = request.form['body']
         error = None
 
         if not title:
-            error = "Title is required."
+            error = TITLE_REQUIRED
         elif not body:
-            error = "Body is required."
+            error = BODY_REQUIRED
 
         if error is None:
             db = get_db()
@@ -71,13 +75,13 @@ def update(post_id):
 
         flash(error)
 
-    post = get_post(post_id)
     return render_template('blog/update.html', post=post)
 
 
 @bp.route("/<int:post_id>/delete", methods=("POST",))
 @login_required
 def delete(post_id):
+    get_post(post_id)
     db = get_db()
     db.execute('DELETE FROM post WHERE id = ?', (post_id,))
     db.commit()
