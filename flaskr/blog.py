@@ -98,10 +98,15 @@ def delete(post_id):
 
 def get_post(post_id, check_author=True):
     post = get_db().execute(
-        'SELECT p.id, title, body, created, author_id, username'
-        ' FROM post p join user u ON p.author_id = u.id'
-        ' WHERE p.id = ?',
-        (post_id,)
+        'SELECT p.id, title, body, created, author_id, username, l.like_count'
+        ' FROM'
+        ' post p join user u ON p.author_id = u.id,'
+        ' ('
+            'SELECT COUNT(post_id) as like_count'
+            ' from likes where post_id = ?'
+        ' ) as l'
+        ' WHERE p.id = ?;',
+        (post_id, post_id)
     ).fetchone()
 
     if not post:
@@ -115,3 +120,14 @@ def get_post(post_id, check_author=True):
         abort(403)
 
     return post
+
+
+def get_like_count(post_id):
+    like_count = get_db().execute(
+        'SELECT COUNT(post_id)'
+        ' FROM likes'
+        ' Where post_id = ?',
+        (post_id, )
+    ).fetchone()[0]
+
+    return like_count
